@@ -1,0 +1,20 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "tenki.jp地域のセットアップ",
+        "description": "tenki.jpの予報ページのURLパスを入力してください。 例: /forecast/3/14/4310/11103/",
+        "data": {
+          "url_path": "URLパス"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "接続に失敗しました",
+      "unknown": "予期しないエラー"
+    },
+    "abort": {
+      "already_configured": "この地域はすでに設定されています"
+    }
+  }
+}
