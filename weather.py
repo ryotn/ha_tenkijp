@@ -94,7 +94,8 @@ class TenkiJpWeather(CoordinatorEntity, WeatherEntity):
         today_hourly = hourly_data.get("today", [])
         for item in today_hourly:
             forecast_hour = item.get("time")
-            if forecast_hour is None or forecast_hour <= now.hour or forecast_hour == 24: continue
+            if forecast_hour is None or forecast_hour <= now.hour: continue
+            if forecast_hour == 24 and now.hour != 23: continue
             condition = get_condition(item.get("weather"), forecast_hour)
             bearing = WIND_BEARING_MAP.get(item.get("wind_direction"))
             forecasts.append({
