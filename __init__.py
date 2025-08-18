@@ -54,12 +54,19 @@ async def async_fetch_data(session: aiohttp.ClientSession, url_path: str):
     hourly = _parse_hourly_forecast(soup_hourly)
     all_data = {"current": _parse_current_conditions(soup_base), "daily": _parse_daily_forecast(soup_base, soup_tenday, hourly), "hourly": hourly}
     try:
-        current_hour = datetime.now().hour
-        today_hourly = all_data["hourly"]["today"]
+        now_hour = datetime.now().hour
+        today_hourly = all_data["hourly"].get("today", [])
+        humidity = None
+        min_diff = 25
         for hour_data in today_hourly:
-            if hour_data.get("time") == current_hour:
-                all_data["current"]["humidity"] = hour_data.get("humidity_percent")
-                break
+            t = hour_data.get("time")
+            if t is not None:
+                diff = abs(t - now_hour)
+                if diff < min_diff and hour_data.get("humidity_percent") is not None:
+                    min_diff = diff
+                    humidity = hour_data.get("humidity_percent")
+        if humidity is not None:
+            all_data["current"]["humidity"] = humidity
     except (IndexError, KeyError, TypeError):
         _LOGGER.warning("Could not determine current humidity from hourly forecast")
     return all_data
