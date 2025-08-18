@@ -107,6 +107,7 @@ def _parse_hourly_forecast(soup):
             "weather": [p.text.strip() for p in table.select('.weather td p')],
             "temperature": [td.text.strip() for td in table.select('.temperature td')],
             "prob_precip": [td.text.strip() for td in table.select('.prob-precip td')],
+            "precipitation": [td.text.strip() for td in table.select('.precipitation td')],  # <-- この行を追加
             "humidity": [td.text.strip() for td in table.select('.humidity td')],
             "wind_direction": [p.text.strip() for p in table.select('.wind-blow td p')],
             "wind_speed": [td.text.strip() for td in table.select('.wind-speed td')],
@@ -114,12 +115,12 @@ def _parse_hourly_forecast(soup):
         day_forecast = []
         for i, hour_td in enumerate(hours_tds):
             try:
-                # このバージョンではまだ降水量は取得しない
                 day_forecast.append({
                     "time": int(hour_td.text.strip()),
                     "weather": data_rows["weather"][i],
                     "temperature": _parse_to_number(data_rows["temperature"][i]),
                     "prob_precip": _parse_prob_precip(data_rows["prob_precip"][i]),
+                    "precipitation": _parse_to_number(data_rows["precipitation"][i]),  # <-- この行を追加
                     "humidity_percent": _parse_to_number(data_rows["humidity"][i]),
                     "wind_direction": data_rows["wind_direction"][i],
                     "wind_speed": _parse_to_number(data_rows["wind_speed"][i]),

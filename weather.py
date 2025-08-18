@@ -97,7 +97,15 @@ class TenkiJpWeather(CoordinatorEntity, WeatherEntity):
             if forecast_hour is None or forecast_hour <= now.hour or forecast_hour == 24: continue
             condition = get_condition(item.get("weather"), forecast_hour)
             bearing = WIND_BEARING_MAP.get(item.get("wind_direction"))
-            forecasts.append({"datetime": f"{today_str}T{str(forecast_hour).zfill(2)}:00:00", "condition": condition, "native_temperature": item.get("temperature"), "precipitation_probability": item.get("prob_precip"), "wind_bearing": bearing, "native_wind_speed": item.get("wind_speed")})
+            forecasts.append({
+                "datetime": f"{today_str}T{str(forecast_hour).zfill(2)}:00:00", 
+                "condition": condition, 
+                "native_temperature": item.get("temperature"), 
+                "precipitation_probability": item.get("prob_precip"), 
+                "native_precipitation": item.get("precipitation"),  # <-- この行を追加
+                "wind_bearing": bearing, 
+                "native_wind_speed": item.get("wind_speed")
+            })
         
         tomorrow_date = now + timedelta(days=1)
         tomorrow_str = tomorrow_date.strftime("%Y-%m-%d")
@@ -107,6 +115,14 @@ class TenkiJpWeather(CoordinatorEntity, WeatherEntity):
             if forecast_hour is None or forecast_hour == 24: continue
             condition = get_condition(item.get("weather"), forecast_hour)
             bearing = WIND_BEARING_MAP.get(item.get("wind_direction"))
-            forecasts.append({"datetime": f"{tomorrow_str}T{str(forecast_hour).zfill(2)}:00:00", "condition": condition, "native_temperature": item.get("temperature"), "precipitation_probability": item.get("prob_precip"), "wind_bearing": bearing, "native_wind_speed": item.get("wind_speed")})
+            forecasts.append({
+                "datetime": f"{tomorrow_str}T{str(forecast_hour).zfill(2)}:00:00", 
+                "condition": condition, 
+                "native_temperature": item.get("temperature"), 
+                "precipitation_probability": item.get("prob_precip"),
+                "native_precipitation": item.get("precipitation"),  # <-- この行を追加
+                "wind_bearing": bearing, 
+                "native_wind_speed": item.get("wind_speed")
+            })
 
         return forecasts
