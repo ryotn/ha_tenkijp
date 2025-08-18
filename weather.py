@@ -98,12 +98,12 @@ class TenkiJpWeather(CoordinatorEntity, WeatherEntity):
             condition = get_condition(item.get("weather"), forecast_hour)
             bearing = WIND_BEARING_MAP.get(item.get("wind_direction"))
             forecasts.append({
-                "datetime": f"{today_str}T{str(forecast_hour).zfill(2)}:00:00", 
-                "condition": condition, 
-                "native_temperature": item.get("temperature"), 
-                "precipitation_probability": item.get("prob_precip"), 
-                "native_precipitation": item.get("precipitation"),  # <-- この行を追加
-                "wind_bearing": bearing, 
+                "datetime": f"{today_str}T{str(forecast_hour).zfill(2)}:00:00",
+                "condition": condition,
+                "native_temperature": item.get("temperature"),
+                "precipitation_probability": item.get("prob_precip"),
+                "native_precipitation": item.get("precipitation"),
+                "wind_bearing": bearing,
                 "native_wind_speed": item.get("wind_speed")
             })
         
@@ -116,12 +116,12 @@ class TenkiJpWeather(CoordinatorEntity, WeatherEntity):
             condition = get_condition(item.get("weather"), forecast_hour)
             bearing = WIND_BEARING_MAP.get(item.get("wind_direction"))
             forecasts.append({
-                "datetime": f"{tomorrow_str}T{str(forecast_hour).zfill(2)}:00:00", 
-                "condition": condition, 
-                "native_temperature": item.get("temperature"), 
+                "datetime": f"{tomorrow_str}T{str(forecast_hour).zfill(2)}:00:00",
+                "condition": condition,
+                "native_temperature": item.get("temperature"),
                 "precipitation_probability": item.get("prob_precip"),
-                "native_precipitation": item.get("precipitation"),  # <-- この行を追加
-                "wind_bearing": bearing, 
+                "native_precipitation": item.get("precipitation"),
+                "wind_bearing": bearing,
                 "native_wind_speed": item.get("wind_speed")
             })
 

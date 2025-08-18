@@ -27,27 +27,24 @@ class TenkiJpConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             session = async_get_clientsession(self.hass)
             
             try:
-                # URLを検証し、地域名を取得
+                # Validate URL and get location name
                 url = f"https://tenki.jp{url_path}"
                 async with session.get(url) as response:
                     response.raise_for_status()
                     html = await response.text()
                     soup = BeautifulSoup(html, "html.parser")
                     
-                    # ★★★★★★★★★★ ここからが変更箇所です ★★★★★★★★★★
-                    # headタグ内のtitleタグから地域名を取得
+                    # Get location name from <title> tag in <head>
                     title_elem = soup.select_one('title')
                     if not title_elem or not title_elem.text:
                         raise ValueError("Title tag not found on page")
                     
-                    # タイトルテキストから地域名を抽出
-                    # 例: "さいたま市大宮区の今日明日の天気 - ..." -> "さいたま市大宮区"
+                    # Extract location name from title text
                     title_text = title_elem.text
                     location_name = title_text.split('の今日明日の天気')[0].strip()
 
                     if not location_name:
                          raise ValueError("Could not parse location name from title")
-                    # ★★★★★★★★★★ ここまでが変更箇所です ★★★★★★★★★★
                     
                     await self.async_set_unique_id(url_path)
                     self._abort_if_unique_id_configured()

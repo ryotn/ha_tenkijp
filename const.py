@@ -3,7 +3,7 @@
 DOMAIN = "tenkijp"
 CONF_URL_PATH = "url_path"
 
-# tenki.jpの天気テキストとHAの標準状態のマッピング
+## Mapping of tenki.jp weather text to HA standard states
 CONDITION_MAP = {
     "雪": "snowy",
     "雨": "rainy",
@@ -12,7 +12,7 @@ CONDITION_MAP = {
 }
 DEFAULT_CONDITION = "sunny"
 
-# ★★★★★★★★★★ ここが正しい16方位の風向マップです ★★★★★★★★★★
+## 16-point wind bearing map
 WIND_BEARING_MAP = {
     "北": 0.0,
     "北北東": 22.5,
