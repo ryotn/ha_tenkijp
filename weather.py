@@ -79,9 +79,20 @@ class TenkiJpWeather(CoordinatorEntity, WeatherEntity):
     async def async_forecast_daily(self) -> list[Forecast] | None:
         forecast_data = self.coordinator.data.get("daily", {}).get("ten_day", [])
         forecasts = []
-        for item in forecast_data:
+        today_data = self.coordinator.data.get("daily", {}).get("today", {})
+        for idx, item in enumerate(forecast_data):
             condition = get_condition(item.get("weather"))
-            forecasts.append({"datetime": item["date"], "condition": condition, "native_temperature": item.get("high_temp"), "native_templow": item.get("low_temp"), "precipitation_probability": item.get("prob_precip")})
+            forecast = {
+                "datetime": item["date"],
+                "condition": condition,
+                "native_temperature": item.get("high_temp"),
+                "native_templow": item.get("low_temp"),
+                "precipitation_probability": item.get("prob_precip")
+            }
+            # 最初（今日）のデータだけtodayのhumidityをセット
+            if idx == 0 and "humidity" in today_data:
+                forecast["humidity"] = today_data["humidity"]
+            forecasts.append(forecast)
         return forecasts
 
     async def async_forecast_hourly(self) -> list[Forecast] | None:
@@ -104,6 +115,7 @@ class TenkiJpWeather(CoordinatorEntity, WeatherEntity):
                 "native_temperature": item.get("temperature"),
                 "precipitation_probability": item.get("prob_precip"),
                 "native_precipitation": item.get("precipitation"),
+                "humidity": item.get("humidity_percent"),
                 "wind_bearing": bearing,
                 "native_wind_speed": item.get("wind_speed")
             })
@@ -122,6 +134,7 @@ class TenkiJpWeather(CoordinatorEntity, WeatherEntity):
                 "native_temperature": item.get("temperature"),
                 "precipitation_probability": item.get("prob_precip"),
                 "native_precipitation": item.get("precipitation"),
+                "humidity": item.get("humidity_percent"),
                 "wind_bearing": bearing,
                 "native_wind_speed": item.get("wind_speed")
             })

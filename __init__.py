@@ -51,7 +51,8 @@ async def async_fetch_data(session: aiohttp.ClientSession, url_path: str):
     soup_base = BeautifulSoup(html_base, "html.parser")
     soup_hourly = BeautifulSoup(html_hourly, "html.parser")
     soup_tenday = BeautifulSoup(html_tenday, "html.parser")
-    all_data = {"current": _parse_current_conditions(soup_base), "daily": _parse_daily_forecast(soup_base, soup_tenday), "hourly": _parse_hourly_forecast(soup_hourly)}
+    hourly = _parse_hourly_forecast(soup_hourly)
+    all_data = {"current": _parse_current_conditions(soup_base), "daily": _parse_daily_forecast(soup_base, soup_tenday, hourly), "hourly": hourly}
     try:
         current_hour = datetime.now().hour
         today_hourly = all_data["hourly"]["today"]
@@ -79,9 +80,27 @@ def _parse_current_conditions(soup):
     pressure_match = re.search(r"(\d+\.\d+|\d+)", pressure_text)
     return {"temperature": float(temp_match.group(1)) if temp_match else None, "wind_speed": float(wind_match.group(1)) if wind_match else None, "wind_direction": wind_direction, "pressure": float(pressure_match.group(1)) if pressure_match else None}
 
-def _parse_daily_forecast(soup_base, soup_tenday):
+def _parse_daily_forecast(soup_base, soup_tenday, hourly):
     today_section = soup_base.select_one('.today-weather')
-    today_forecast = {"weather": today_section.select_one('.weather-telop').text if today_section else None, "high_temp": _parse_to_number(today_section.select_one('.high-temp .value').text) if today_section else None, "low_temp": _parse_to_number(today_section.select_one('.low-temp .value').text) if today_section else None}
+    today_forecast = {
+        "weather": today_section.select_one('.weather-telop').text if today_section else None,
+        "high_temp": _parse_to_number(today_section.select_one('.high-temp .value').text) if today_section else None,
+        "low_temp": _parse_to_number(today_section.select_one('.low-temp .value').text) if today_section else None
+    }
+    # 毎時データから現時刻に近い湿度を取得
+    now = datetime.now()
+    today_hourly = hourly.get("today", [])
+    humidity = None
+    min_diff = 25
+    for h in today_hourly:
+        t = h.get("time")
+        if t is not None:
+            diff = abs(t - now.hour)
+            if diff < min_diff and h.get("humidity_percent") is not None:
+                min_diff = diff
+                humidity = h.get("humidity_percent")
+    if humidity is not None:
+        today_forecast["humidity"] = humidity
     ten_day_forecast = []
     year = datetime.now().year
     last_month = 0
@@ -92,7 +111,13 @@ def _parse_daily_forecast(soup_base, soup_tenday):
         month, day = int(date_match.group(1)), date_match.group(2)
         if month < last_month: year += 1
         last_month = month
-        ten_day_forecast.append({"date": f"{year}-{str(month).zfill(2)}-{str(day).zfill(2)}", "weather": day_row.select_one('.forecast-telop').text, "high_temp": _parse_to_number(day_row.select_one('.high-temp').text), "low_temp": _parse_to_number(day_row.select_one('.low-temp').text), "prob_precip": _parse_prob_precip(day_row.select_one('.prob-precip').text)})
+        ten_day_forecast.append({
+            "date": f"{year}-{str(month).zfill(2)}-{str(day).zfill(2)}",
+            "weather": day_row.select_one('.forecast-telop').text,
+            "high_temp": _parse_to_number(day_row.select_one('.high-temp').text),
+            "low_temp": _parse_to_number(day_row.select_one('.low-temp').text),
+            "prob_precip": _parse_prob_precip(day_row.select_one('.prob-precip').text)
+        })
     return {"today": today_forecast, "ten_day": ten_day_forecast}
 
 def _parse_hourly_forecast(soup):
