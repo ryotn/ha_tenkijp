@@ -1,12 +1,12 @@
 {
   "domain": "tenkijp",
   "name": "tenki.jp Weather",
-  "documentation": "https://github.com/your-github-username/ha-tenkijp",
+  "documentation": "https://github.com/ryotn/ha_tenkijp",
   "iot_class": "cloud_polling",
-  "issue_tracker": "https://github.com/your-github-username/ha-tenkijp/issues",
+  "issue_tracker": "https://github.com/ryotn/ha_tenkijp/issues",
   "version": "1.0.0",
   "config_flow": true,
-  "codeowners": [],
+  "codeowners": ["@ryotn"],
   "requirements": [
     "aiohttp",
     "beautifulsoup4"

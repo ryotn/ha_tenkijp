@@ -1,0 +1,7 @@
+{
+  "name": "tenki.jp Weather",
+  "content_in_root": false,
+  "domains": ["weather"],
+  "country": "JP",
+  "homeassistant": "2025.8.0"
+}
